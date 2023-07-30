@@ -6,7 +6,8 @@ const CameraComponent = () => {
   const canvasRef = useRef(null);
   const [videoDims, setVideoDims] = useState({ width: 640, height: 480 });
   const [isDetecting, setIsDetecting] = useState(false);
-  const detectionInterval = useRef(null); // Use useRef for detectionInterval
+  const isDetectingRef = useRef(false); // New ref for tracking detection state
+  const detectionInterval = useRef(null);
   const noFaceDetectedTimeout = useRef(null);
 
   useEffect(() => {
@@ -61,15 +62,18 @@ const CameraComponent = () => {
           noFaceDetectedTimeout.current = null;
         }
 
-        const resizedDetections = faceapi.resizeResults(
-          detections,
-          displaySize
-        );
-
-        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-        faceapi.draw.drawDetections(canvas, resizedDetections);
+        if (isDetectingRef.current) {
+          const resizedDetections = faceapi.resizeResults(
+            detections,
+            displaySize
+          );
+  
+          canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+          faceapi.draw.drawDetections(canvas, resizedDetections);
+        }
       }, 100);
 
+      isDetectingRef.current = true;
       setIsDetecting(true);
     }
   };
@@ -80,6 +84,7 @@ const CameraComponent = () => {
       clearTimeout(noFaceDetectedTimeout.current);
       const canvas = canvasRef.current;
       canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+      isDetectingRef.current = false;
       setIsDetecting(false);
     }
   };
@@ -107,8 +112,8 @@ const CameraComponent = () => {
         ></canvas>
       </div>
       <div>
-        <button onClick={() => { startFaceDetection(); setIsDetecting(true); }} disabled={isDetecting}>Start Detection</button>
-        <button onClick={() => { stopFaceDetection(); setIsDetecting(false); }} disabled={!isDetecting}>Stop Detection</button>
+          <button onClick={startFaceDetection} disabled={isDetecting} className="btn btn-primary">Start Detection</button>
+          <button onClick={stopFaceDetection} disabled={!isDetecting} className="btn btn-secondary">Stop Detection</button>
       </div>
     </div>
   );
