@@ -18,7 +18,7 @@ Check out the live demo: [Vercel Deployment](https://face-recognition-next-js.ve
 
 - Real-time face detection using the Tiny Face API.
 - Single-person and multiple-person detection.
-- Alert when there are no person.
+- Alert when there is no person.
 
 ## How to Use
 
